@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Facebook Account Manager</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-section').forEach(section => section.classList.add('hidden'));
+      document.getElementById(tabId).classList.remove('hidden');
+    }
+
+    function splitCookie() {
+      const input = document.getElementById('splitInput').value;
+      const parts = input.split(';').map(p => p.trim()).filter(Boolean);
+      const output = document.getElementById('splitResult');
+      output.innerHTML = '';
+      parts.forEach(part => {
+        const [key, value] = part.split('=');
+        const div = document.createElement('div');
+        div.className = 'flex flex-col';
+        div.innerHTML = `<label class="text-sm font-semibold text-gray-600">${key}</label><input class="border rounded px-2 py-1" value="${value || ''}" readonly name="${key}">`;
+        output.appendChild(div);
+      });
+      toast("✅ Đã tách cookie thành công");
+    }
+
+    function copySplit() {
+      const lines = Array.from(document.querySelectorAll('#splitResult input'))
+        .map(input => `${input.name}: ${input.value}`);
+      navigator.clipboard.writeText(lines.join('\n'));
+      toast("📋 Đã sao chép vào clipboard!");
+    }
+
+    function addSplitToAccount() {
+      const inputs = document.querySelectorAll('#splitResult input');
+      const acc = {
+        uid: getVal(inputs, 'c_user') || '',
+        email: '', phone: '', name: '', password: '',
+        m2fa: getVal(inputs, 'm2fa') || '',
+        proxy: getVal(inputs, 'proxy') || '',
+        note: 'Từ cookie', deleted_at: '', status: 'Chưa xác định'
+      };
+      const row = document.createElement('tr');
+      row.className = 'bg-red-100';
+      row.innerHTML = `
+        <td><input type="checkbox" value="${acc.uid}" /></td>
+        <td>${acc.uid}</td><td>${acc.email}</td><td>${acc.phone}</td><td>${acc.name}</td>
+        <td>${acc.password}</td><td>${acc.m2fa}</td><td>${acc.proxy}</td><td>${acc.note}</td>
+        <td>${acc.deleted_at}</td><td>${acc.status}</td>
+      `;
+      const table = document.querySelector('#accountTable tbody');
+      table.appendChild(row);
+      document.getElementById('accountTable').classList.remove('hidden');
+      switchTab('accountTableWrapper');
+      toast("✅ Cookie đã thêm vào bảng tài khoản");
+    }
+
+    function deleteSelectedAccounts() {
+      document.querySelectorAll('#accountTable tbody input[type=checkbox]:checked')
+        .forEach(cb => cb.closest('tr').remove());
+      toast("🗑️ Đã xoá các tài khoản đã chọn");
+    }
+
+    function exportToCSV() {
+      const rows = document.querySelectorAll('#accountTable tr');
+      const csv = Array.from(rows).map(row =>
+        Array.from(row.querySelectorAll('th, td')).map(cell => '"' + cell.innerText + '"').join(',')
+      ).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'accounts.csv';
+      link.click();
+      toast("📥 Đã xuất file CSV");
+    }
+
+    function getVal(inputs, key) {
+      const found = Array.from(inputs).find(i => i.name === key);
+      return found ? found.value : '';
+    }
+
+    function toast(message) {
+      const toast = document.createElement('div');
+      toast.textContent = message;
+      toast.className = 'fixed bottom-5 right-5 bg-green-600 text-white px-4 py-2 rounded shadow-lg animate-bounce z-50';
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+  </script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <nav class="bg-blue-600 text-white px-6 py-4 flex justify-between items-center shadow-md">
+    <h1 class="text-lg font-bold">Facebook Tool Manager</h1>
+    <div class="space-x-4">
+      <button onclick="switchTab('accountTableWrapper')" class="hover:underline">📋 Quản lý tài khoản</button>
+      <button onclick="switchTab('splitter')" class="hover:underline">✂️ Tách cookie</button>
+    </div>
+  </nav>
+
+  <main class="p-6">
+    <section id="splitter" class="tab-section">
+      <h2 class="text-xl font-semibold mb-4">✂️ Tách Cookie thành các phần</h2>
+      <textarea id="splitInput" class="w-full border rounded p-2 mb-4" placeholder="Dán 1 dòng cookie vào đây..."></textarea>
+      <div class="space-x-2 mb-4">
+        <button onclick="splitCookie()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Tách</button>
+        <button onclick="copySplit()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">📋 Sao chép</button>
+        <button onclick="addSplitToAccount()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded">➕ Thêm vào danh sách</button>
+      </div>
+      <div id="splitResult" class="grid grid-cols-2 md:grid-cols-3 gap-4"></div>
+    </section>
+
+    <section id="accountTableWrapper" class="tab-section hidden">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold">📋 Danh sách tài khoản</h2>
+        <div class="space-x-2">
+          <button onclick="deleteSelectedAccounts()" class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded">🗑️ Xoá đã chọn</button>
+          <button onclick="exportToCSV()" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded">📤 Xuất CSV</button>
+        </div>
+      </div>
+      <table id="accountTable" class="min-w-full bg-white shadow rounded overflow-hidden hidden">
+        <thead class="bg-blue-100">
+          <tr>
+            <th class="px-3 py-2 border">Chọn</th>
+            <th class="px-3 py-2 border">UID</th>
+            <th class="px-3 py-2 border">Email</th>
+            <th class="px-3 py-2 border">Phone</th>
+            <th class="px-3 py-2 border">Tên</th>
+            <th class="px-3 py-2 border">Mật khẩu</th>
+            <th class="px-3 py-2 border">2FA</th>
+            <th class="px-3 py-2 border">Proxy</th>
+            <th class="px-3 py-2 border">Ghi chú</th>
+            <th class="px-3 py-2 border">Xoá lúc</th>
+            <th class="px-3 py-2 border">Trạng thái</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>

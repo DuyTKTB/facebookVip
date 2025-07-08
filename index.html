@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Facebook Tool - Nguyễn Thế Duy TK</title>
+  <style>
+    /* Animation cho các tab */
+.tab-content {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease-in-out;
+}
+
+.tab-content.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Animation cho các thẻ cookie */
+.card {
+    animation: fadeInUp 0.5s ease-in-out;
+}
+
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+    /* Thiết kế các thẻ cookie */
+.card {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    margin: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 119, 242, 0.2);
+}
+
+.card .card-header {
+    font-size: 18px;
+    font-weight: bold;
+    color: #1877f2;
+    margin-bottom: 10px;
+}
+
+.card .card-body {
+    color: #555;
+}
+
+  /* Thêm hiệu ứng hover cho nút */
+button {
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 10px rgba(24, 119, 242, 0.2);
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(24, 119, 242, 0.4);
+}
+
+/* Hiệu ứng hover cho input */
+input, textarea {
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input:focus, textarea:focus {
+    outline: none;
+    border-color: #1877f2;
+    box-shadow: 0 0 8px rgba(24, 119, 242, 0.5);
+}
+    
+    body.loading {
+      overflow: hidden;
+    }
+    #loading-screen {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: #1877f2;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      z-index: 9999;
+    }
+    .add-account {
+      margin-top: 20px;
+      background: #f9f9f9;
+      padding: 10px;
+      border-radius: 10px;
+    }
+    .add-account input {
+      margin: 4px 0;
+      padding: 8px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .add-account button {
+      background: #1877f2;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .action-buttons {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
+    .action-buttons button {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+    }
+    .action-buttons button:last-child {
+      background: red;
+      color: white;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    table th, table td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    table th {
+      background: #1877f2;
+      color: white;
+    }
+    /* Reset & cơ bản */
+    * {
+      box-sizing: border-box;
+    }
+    body, html {
+      margin: 0; padding: 0; height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom right, #dfe9f3, #ffffff);
+      color: #222;
+      overflow: hidden;
+      transition: background-color 0.5s, color 0.5s;
+    }
+    body.dark {
+      background: #18191a;
+      color: #e4e6eb;
+    }
+    a {
+      color: #1877f2;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    a:hover {
+      color: #0e62c7;
+      text-decoration: underline;
+    }
+    /* Layout */
+    .wrapper {
+      display: flex;
+      height: 100%;
+      width: 100vw;
+      padding: 30px;
+      gap: 50px;
+      overflow: hidden;
+    }
+    /* Profile bên trái */
+    .profile {
+      width: 280px;
+      background: #f0f4ff;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 4px 15px rgba(24, 119, 242, 0.2);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      text-align: center;
+      flex-shrink: 0;
+      overflow-y: auto;
+      height: 100%;
+      transition: background-color 0.5s, color 0.5s;
+    }
+    body.dark .profile {
+      background: #242526;
+      color: #e4e6eb;
+    }
+    .profile img.avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 0 15px rgba(24, 119, 242, 0.4);
+      transition: box-shadow 0.5s;
+    }
+    body.dark .profile img.avatar {
+      box-shadow: 0 0 15px rgba(24, 119, 242, 0.8);
+    }
+    .profile h3 {
+      margin: 0;
+      color: #1877f2;
+      transition: color 0.5s;
+    }
+    .profile p {
+      margin: 0;
+      font-size: 14px;
+      color: #555;
+      transition: color 0.5s;
+    }
+    body.dark .profile p {
+      color: #c1c1c1;
+    }
+    /* Tools bên phải */
+    .tools {
+      flex-grow: 1;
+      background: #fff;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      overflow-y: auto;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      transition: background-color 0.5s, color 0.5s;
+    }
+    body.dark .tools {
+      background: #242526;
+      color: #e4e6eb;
+    }
+    /* Toggle Dark Mode */
+    #toggleTheme {
+      background: #1877f2;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 160px;
+      align-self: flex-end;
+      margin-bottom: 25px;
+      box-shadow: 0 6px 15px rgba(24,119,242,0.4);
+      transition: background-color 0.3s;
+    }
+    #toggleTheme:hover {
+      background: #0e62c7;
+    }
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      justify-content: space-between;
+    }
+    .tab-button {
+      flex: 1 1 auto;
+      padding: 8px 0;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 14px;
+      background: #e0e4ec;
+      color: #333;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s, color 0.3s;
+      text-align: center;
+      user-select: none;
+    }
+    .tab-button.active {
+      background: #1877f2;
+      color: white;
+    }
+    /* Tab content */
+    .tab-content {
+      display: none;
+      flex-grow: 1;
+      overflow-y: auto;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+    .tab-content.active {
+      display: block;
+      opacity: 1;
+    }
+    h2 {
+      text-align: center;
+      color: #1877f2;
+      margin-bottom: 20px;
+      user-select: none;
+      transition: color 0.5s;
+    }
+    /* Input & labels */
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: 600;
+      user-select: none;
+    }
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-top: 5px;
+      font-size: 15px;
+      box-sizing: border-box;
+      transition: border-color 0.3s;
+    }
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: #1877f2;
+      box-shadow: 0 0 8px rgba(24, 119, 242, 0.4);
+    }
+    body.dark input,
+    body.dark textarea,
+    body.dark select {
+      background: #3a3b3c;
+      color: #e4e6eb;
+      border-color: #555;
+    }
+    /* Button */
+    button {
+      margin-top: 18px;
+      padding: 14px;
+      width: 100%;
+      background: #1877f2;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.15s;
+      user-select: none;
+      box-shadow: 0 6px 15px rgba(24,119,242,0.4);
+    }
+    button:hover {
+      background: #0e62c7;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(24,119,242,0.6);
+    }
+    button:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 10px rgba(24,119,242,0.3);
+    }
+    /* Log */
+    .log {
+      margin-top: 15px;
+      background: #f7f7f7;
+      padding: 14px;
+      border-radius: 8px;
+      white-space: pre-line;
+      border: 1px dashed #ccc;
+      min-height: 70px;
+      max-height: 160px;
+      overflow-y: auto;
+      user-select: text;
+      font-family: monospace;
+      font-size: 14px;
+      transition: background-color 0.5s, color 0.5s;
+    }
+    body.dark .log {
+      background: #3a3b3c;
+      border-color: #666;
+      color: #e4e6eb;
+    }
+    /* Media buttons */
+    .media-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .media-button {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      background: #edf0f5;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+      user-select: none;
+    }
+    .media-button:hover {
+      background: #d8dadf;
+    }
+    .media-button img {
+      width: 20px;
+      margin-right: 8px;
+    }
+    /* Preview */
+    .preview {
+      margin-top: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .preview img,
+    .preview video {
+      max-width: 100%;
+      border-radius: 6px;
+      box-shadow: 0 0 10px rgba(24,119,242,0.2);
+      user-select: none;
+    }
+    /* File input hidden */
+    input[type='file'] {
+      display: none;
+    }
+    /* Tooltip */
+    [data-tooltip] {
+      position: relative;
+      cursor: help;
+    }
+    [data-tooltip]::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 125%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: #fff;
+      padding: 5px 8px;
+      border-radius: 5px;
+      white-space: nowrap;
+      font-size: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      z-index: 1000;
+    }
+    [data-tooltip]:hover::after {
+      opacity: 1;
+    }
+
+    /* Drag & drop highlight */
+    .dropzone {
+      border: 2px dashed #1877f2;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 12px;
+      text-align: center;
+      color: #1877f2;
+      font-weight: 600;
+      transition: background-color 0.3s, color 0.3s;
+      user-select: none;
+    }
+    .dropzone.dragover {
+      background-color: #1877f2;
+      color: white;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .wrapper {
+        flex-direction: column;
+        padding: 15px;
+        gap: 25px;
+      }
+      .profile {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        gap: 15px;
+        padding: 15px;
+        justify-content: flex-start;
+        text-align: left;
+      }
+      .profile img.avatar {
+        width: 70px;
+        height: 70px;
+      }
+      .profile h3 {
+        font-size: 18px;
+      }
+      .tools {
+        height: auto;
+        padding: 15px;
+      }
+      .tabs {
+        flex-wrap: wrap;
+      }
+      .tab-button {
+        flex: 1 1 45%;
+        margin-bottom: 8px;
+      }
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #1877f2;
+      color: white;
+    }
+    .action-buttons {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
+    .action-buttons button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .action-buttons button:last-child {
+      background: red;
+      color: white;
+    }
+    .add-account {
+      margin: 20px 0;
+      background: #f4f4f4;
+      padding: 15px;
+      border-radius: 10px;
+    }
+    .add-account input {
+      margin-bottom: 10px;
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    .add-account button {
+      padding: 8px 16px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+        body.loading {
+      overflow: hidden;
+    }
+    #loading-screen {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: #1877f2;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      z-index: 9999;
+    }
+    .add-account {
+      margin-top: 20px;
+      background: #f9f9f9;
+      padding: 10px;
+      border-radius: 10px;
+    }
+    .add-account input {
+      margin: 4px 0;
+      padding: 8px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .add-account button {
+      background: #1877f2;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .action-buttons {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+    }
+    .action-buttons button {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+    }
+    .action-buttons button:last-child {
+      background: red;
+      color: white;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    table th, table td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    table th {
+      background: #1877f2;
+      color: white;
+    }
+    .search-box {
+      margin-top: 15px;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    .check-button {
+      background: orange;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <body class="loading">
+  <div id="loading-screen">Đang tải TOOLFACEBOOK do nhà sáng tạo NGUYỄN DUY TK thành lập...</div>
+  <div class="wrapper">
+    <!-- Profile cố định bên trái -->
+    <div class="profile" aria-label="Thông tin cá nhân">
+      <img
+        src="./img/z6690197937354_2d701759cdf25d68f5542f8421862af2.jpg"
+        alt="Ảnh đại diện Nguyễn Thế Duy TK"
+        class="avatar"
+      />
+      <div>
+        <h3>Nguyễn Thế Duy TK</h3>
+        <p>Email: duyfamabo@gmail.com</p>
+        <p>
+          Website:
+          <a href="https://nguyenduytk.dev" target="_blank" rel="noopener noreferrer"
+            >nguyenduytk.dev</a
+          >
+        </p>
+        <p>Facebook Tool v1.0</p>
+      </div>
+    </div>
+
+    <!-- Tools bên phải -->
+    <div class="tools" role="main" aria-label="Công cụ Facebook">
+      <button id="toggleTheme" aria-pressed="false" title="Chuyển đổi chế độ sáng/tối">
+        🌙 Chuyển chế độ tối
+      </button>
+
+      <div class="tabs" role="tablist" aria-label="Các công cụ Facebook">
+        <button
+          class="tab-button active"
+          onclick="switchTab('post')"
+          role="tab"
+          aria-selected="true"
+          aria-controls="tab-post"
+          id="tabbtn-post"
+        >
+          ✍️ Đăng Bài
+        </button>
+        
+        <button
+          class="tab-button"
+          onclick="switchTab('react')"
+          role="tab"
+          aria-selected="false"
+          aria-controls="tab-react"
+          id="tabbtn-react"
+        >
+          ❤️ Cảm Xúc
+        </button>
+        <button
+          class="tab-button"
+          onclick="switchTab('comment')"
+          role="tab"
+          aria-selected="false"
+          aria-controls="tab-comment"
+          id="tabbtn-comment"
+        >
+          💬 Bình Luận
+        </button>
+        <button
+          class="tab-button"
+          onclick="switchTab('share')"
+          role="tab"
+          aria-selected="false"
+          aria-controls="tab-share"
+          id="tabbtn-share"
+        >
+          🔁 Chia Sẻ
+        </button>
+        <button
+          class="tab-button"
+          onclick="switchTab('cookie')"
+          role="tab"
+          aria-selected="false"
+          aria-controls="tab-cookie"
+          id="tabbtn-cookie"
+        >
+          🗂️ Quản Lý Cookie
+        </button>        
+      </div>
+
+      <div
+        id="tab-post"
+        class="tab-content active"
+        role="tabpanel"
+        aria-labelledby="tabbtn-post"
+        tabindex="0"
+      >
+      
+        <h2>Tool Đăng Bài Facebook</h2>
+
+        <label for="cookie" data-tooltip="Dán cookie Facebook của bạn vào đây">Cookie Facebook:</label>
+        <textarea
+          id="cookie"
+          rows="3"
+          placeholder="Dán cookie tài khoản Facebook..."
+          aria-describedby="err-cookie"
+        ></textarea>
+        <small id="err-cookie" style="color: red; display:none;">* Cookie không được để trống</small>
+
+        <label for="message" data-tooltip="Nội dung bài viết bạn muốn đăng">Nội dung bài viết:</label>
+        <textarea
+          id="message"
+          rows="3"
+          placeholder="Nội dung bài viết..."
+          aria-describedby="err-message"
+        ></textarea>
+        <small id="err-message" style="color: red; display:none;">* Nội dung không được để trống</small>
+
+        <div
+          class="dropzone"
+          id="dropzone"
+          aria-label="Kéo thả ảnh hoặc video vào đây hoặc nhấn để chọn tệp"
+          tabindex="0"
+        >
+          Kéo thả ảnh hoặc video vào đây hoặc nhấn để chọn
+        </div>
+        <input type="file" id="mediaFile" accept="image/*,video/*" style="display:none" />
+
+        <div class="preview" id="media-preview" aria-live="polite"></div>
+        <button id="postBtn">🚀 Đăng Bài Ngay</button>
+                <div id="fbPostPreview" style="margin-top: 20px; padding: 12px; border-radius: 8px; border: 1px solid #ccc; background: #f0f2f5;">
+  <strong id="previewName">Nguyễn Thế Duy TK</strong>
+  <p id="previewContent">Nội dung bài viết sẽ hiển thị ở đây...</p>
+</div>
+
+        <div id="log" class="log" aria-live="polite" role="status">
+          👉 Nhập thông tin và nhấn nút để bắt đầu...
+        </div>
+      </div>
+
+      <div
+        id="tab-react"
+        class="tab-content"
+        role="tabpanel"
+        aria-labelledby="tabbtn-react"
+        tabindex="0"
+      >
+        <h2>Tool Thả Cảm Xúc</h2>
+
+        <label for="cookieReact" data-tooltip="Dán cookie Facebook của bạn vào đây">Cookie Facebook:</label>
+        <textarea
+          id="cookieReact"
+          rows="3"
+          placeholder="Dán cookie tài khoản Facebook..."
+          aria-describedby="err-cookieReact"
+        ></textarea>
+        <small id="err-cookieReact" style="color: red; display:none;">* Cookie không được để trống</small>
+
+        <label for="postID" data-tooltip="ID bài viết bạn muốn thả cảm xúc">ID Bài Viết:</label>
+        <input id="postID" placeholder="Nhập ID bài viết" aria-describedby="err-postID" />
+        <small id="err-postID" style="color: red; display:none;">* ID bài viết không được để trống</small>
+
+        <label for="reaction" data-tooltip="Chọn loại cảm xúc để thả">Chọn Cảm Xúc:</label>
+        <select id="reaction" aria-describedby="err-reaction">
+          <option value="LIKE">👍 Like</option>
+          <option value="LOVE">❤️ Love</option>
+          <option value="HAHA">😆 Haha</option>
+          <option value="WOW">😲 Wow</option>
+          <option value="SAD">😢 Sad</option>
+          <option value="ANGRY">😡 Angry</option>
+          <option value="CARE">🤗 Care</option>
+        </select>
+
+        <button id="reactBtn">💥 Thả Cảm Xúc</button>
+
+        <div id="log-react" class="log" aria-live="polite" role="status"></div>
+      </div>
+
+      <div
+        id="tab-comment"
+        class="tab-content"
+        role="tabpanel"
+        aria-labelledby="tabbtn-comment"
+        tabindex="0"
+      >
+        <h2>Tool Bình Luận</h2>
+
+        <label for="cookieComment" data-tooltip="Dán cookie Facebook của bạn vào đây">Cookie Facebook:</label>
+        <textarea
+          id="cookieComment"
+          rows="3"
+          placeholder="Dán cookie tài khoản Facebook..."
+          aria-describedby="err-cookieComment"
+        ></textarea>
+        <small id="err-cookieComment" style="color: red; display:none;">* Cookie không được để trống</small>
+
+        <label for="postIDComment" data-tooltip="ID bài viết bạn muốn bình luận">ID Bài Viết:</label>
+        <input
+          id="postIDComment"
+          placeholder="Nhập ID bài viết"
+          aria-describedby="err-postIDComment"
+        />
+        <small id="err-postIDComment" style="color: red; display:none;">* ID bài viết không được để trống</small>
+
+        <label for="commentText" data-tooltip="Nội dung bình luận bạn muốn gửi">Nội dung bình luận:</label>
+        <textarea
+          id="commentText"
+          rows="3"
+          placeholder="Nội dung bình luận..."
+          aria-describedby="err-commentText"
+        ></textarea>
+        <small id="err-commentText" style="color: red; display:none;">* Nội dung không được để trống</small>
+
+        <button id="commentBtn">📢 Gửi Bình Luận</button>
+
+        <div id="log-comment" class="log" aria-live="polite" role="status"></div>
+      </div>
+
+      <div
+        id="tab-share"
+        class="tab-content"
+        role="tabpanel"
+        aria-labelledby="tabbtn-share"
+        tabindex="0"
+      >
+        <h2>Tool Chia Sẻ</h2>
+
+        <label for="cookieShare" data-tooltip="Dán cookie Facebook của bạn vào đây">Cookie Facebook:</label>
+        <textarea
+          id="cookieShare"
+          rows="3"
+          placeholder="Dán cookie tài khoản Facebook..."
+          aria-describedby="err-cookieShare"
+        ></textarea>
+        <small id="err-cookieShare" style="color: red; display:none;">* Cookie không được để trống</small>
+
+        <label for="postIDShare" data-tooltip="ID bài viết bạn muốn chia sẻ">ID Bài Viết:</label>
+        <input
+          id="postIDShare"
+          placeholder="Nhập ID bài viết"
+          aria-describedby="err-postIDShare"
+        />
+        <small id="err-postIDShare" style="color: red; display:none;">* ID bài viết không được để trống</small>
+
+        <label for="shareText" data-tooltip="Nội dung chia sẻ tùy chọn">Nội dung chia sẻ (tùy chọn):</label>
+        <textarea
+          id="shareText"
+          rows="2"
+          placeholder="Nội dung chia sẻ (không bắt buộc)"
+        ></textarea>
+
+        <button id="shareBtn">🔗 Chia Sẻ Bài Viết</button>
+
+        <div id="log-share" class="log" aria-live="polite" role="status"></div>
+      </div>
+      <div
+        id="tab-cookie"
+        class="tab-content"
+        role="tabpanel"
+        aria-labelledby="tabbtn-share"
+        tabindex="0"
+      >
+
+        <h2>🗂️ Quản Lý Cookie</h2>
+
+        <div class="search-box">
+          <input type="text" id="searchInput" placeholder="Tìm kiếm UID hoặc Tên..." oninput="filterAccounts()" />
+        </div>
+
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>STT</th><th>UID</th><th>Email</th><th>Phone</th><th>Tên</th><th>Mật Khẩu</th><th>Mã 2FA</th><th>Proxy</th><th>Ghi Chú</th><th>Thời Gian Xóa</th><th>Trạng Thái</th><th>Hành Động</th>
+              </tr>
+            </thead>
+            <tbody id="accountTable"></tbody>
+          </table>
+        </div>
+
+        <div class="add-account">
+          <input id="newUID" placeholder="UID">
+          <input id="newEmail" placeholder="Email">
+          <input id="newPhone" placeholder="Phone">
+          <input id="newName" placeholder="Tên">
+          <input id="newPassword" placeholder="Mật khẩu">
+          <input id="new2FA" placeholder="Mã 2FA">
+          <input id="newProxy" placeholder="Proxy">
+          <input id="newNote" placeholder="Ghi chú">
+          <input id="newTime" placeholder="Thời gian xóa (VD: 22:00 01/01/2025)">
+          <input id="newStatus" placeholder="Trạng thái">
+          <button onclick="addAccount()">➕ Thêm tài khoản</button>
+        </div>
+
+        <div class="action-buttons">
+          <button onclick="exportCSV()">📤 Xuất CSV</button>
+          <button onclick="clearAccounts()">🗑️ Xóa tất cả</button>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Cập nhật live preview khi gõ nội dung bài viết
+document.getElementById('message').addEventListener('input', function () {
+  document.getElementById('previewContent').textContent = this.value || "Nội dung bài viết sẽ hiển thị ở đây...";
+});
+
+// (Tùy chọn) cập nhật tên người đăng nếu bạn lấy từ cookie hoặc người dùng nhập
+// document.getElementById('previewName').textContent = 'Tên tài khoản Facebook';
+
+        window.addEventListener('load', function() {
+      document.getElementById('loading-screen').style.display = 'none';
+      document.body.classList.remove('loading');
+      document.querySelector('.wrapper').style.display = 'flex';
+    });
+        function addAccount() {
+  const cookie = prompt("Dán Cookie để tự động điền thông tin tài khoản:");
+  if (!cookie) return alert("Bạn chưa dán Cookie!");
+
+  // Gọi API xử lý cookie và trả về thông tin
+  fetch("http://localhost:5000/parse_cookie", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ cookie })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success) return alert("Không phân tích được cookie: " + (data.error || ""));
+
+      const table = document.getElementById("accountTable");
+      const row = document.createElement("tr");
+      const info = data.account;
+
+      row.innerHTML = `
+        <td>${table.rows.length + 1}</td>
+        <td>${info.uid || ''}</td>
+        <td>${info.email || ''}</td>
+        <td>${info.phone || ''}</td>
+        <td>${info.name || ''}</td>
+        <td>${info.password || ''}</td>
+        <td>${info.fa2 || ''}</td>
+        <td>${info.proxy || ''}</td>
+        <td>${info.note || ''}</td>
+        <td>${info.time || ''}</td>
+        <td>${info.status || ''}</td>
+        <td>
+          <button onclick="checkCookie('${info.uid}')" class="check-button">Check</button>
+          <button onclick="this.closest('tr').remove()">❌</button>
+        </td>
+      `;
+
+      table.appendChild(row);
+      saveToLocalStorage();
+    })
+    .catch(err => alert("Lỗi khi gửi cookie: " + err.message));
+}
+
+    function clearAccounts() {
+      if (confirm("Bạn có chắc chắn muốn xóa tất cả không?")) {
+        document.getElementById("accountTable").innerHTML = "";
+        localStorage.removeItem('accounts');
+      }
+    }
+
+    function exportCSV() {
+      const rows = document.querySelectorAll("table tr");
+      let csv = "";
+      rows.forEach(row => {
+        const cols = row.querySelectorAll("td, th");
+        const rowData = Array.from(cols).slice(0, 11).map(col => `"${col.innerText}"`).join(",");
+        csv += rowData + "\n";
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'accounts.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function saveToLocalStorage() {
+      const rows = document.querySelectorAll("#accountTable tr");
+      const data = Array.from(rows).map(row => {
+        const cells = row.querySelectorAll("td");
+        return {
+          uid: cells[1]?.innerText,
+          email: cells[2]?.innerText,
+          phone: cells[3]?.innerText,
+          name: cells[4]?.innerText,
+          password: cells[5]?.innerText,
+          fa2: cells[6]?.innerText,
+          proxy: cells[7]?.innerText,
+          note: cells[8]?.innerText,
+          time: cells[9]?.innerText,
+          status: cells[10]?.innerText
+        };
+      });
+      localStorage.setItem('accounts', JSON.stringify(data));
+    }
+
+    function loadFromLocalStorage() {
+      const saved = JSON.parse(localStorage.getItem('accounts') || '[]');
+      saved.forEach(data => {
+        const table = document.getElementById("accountTable");
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${table.rows.length + 1}</td>
+          <td>${data.uid}</td>
+          <td>${data.email}</td>
+          <td>${data.phone}</td>
+          <td>${data.name}</td>
+          <td>${data.password}</td>
+          <td>${data.fa2}</td>
+          <td>${data.proxy}</td>
+          <td>${data.note}</td>
+          <td>${data.time}</td>
+          <td>${data.status}</td>
+          <td>
+            <button onclick="checkCookie('${data.uid}')" class="check-button">Check</button>
+            <button onclick="this.closest('tr').remove()">❌</button>
+          </td>
+        `;
+        table.appendChild(row);
+      });
+    }
+
+    function filterAccounts() {
+      const keyword = document.getElementById('searchInput').value.toLowerCase();
+      const rows = document.querySelectorAll('#accountTable tr');
+      rows.forEach(row => {
+        const uid = row.cells[1]?.innerText.toLowerCase();
+        const name = row.cells[4]?.innerText.toLowerCase();
+        row.style.display = (uid.includes(keyword) || name.includes(keyword)) ? '' : 'none';
+      });
+    }
+
+    function checkCookie(uid) {
+      alert(`Đang kiểm tra cookie của UID: ${uid}\n(Hàm này bạn cần kết nối API để kiểm tra thực tế)`);
+    }
+    // Dark mode toggle
+    const toggleThemeBtn = document.getElementById('toggleTheme');
+    toggleThemeBtn.addEventListener('click', () => {
+      const isDark = document.body.classList.toggle('dark');
+      toggleThemeBtn.textContent = isDark ? '☀️ Chuyển chế độ sáng' : '🌙 Chuyển chế độ tối';
+      toggleThemeBtn.setAttribute('aria-pressed', isDark.toString());
+    });
+
+    // Tab switch function with fade effect and ARIA update
+    function switchTab(tab) {
+      const btns = document.querySelectorAll('.tab-button');
+      const tabs = document.querySelectorAll('.tab-content');
+
+      btns.forEach(btn => {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-selected', 'false');
+      });
+      tabs.forEach(tabC => {
+        tabC.classList.remove('active');
+        tabC.setAttribute('hidden', 'true');
+        tabC.style.opacity = 0;
+      });
+
+      const activeBtn = document.querySelector(`[onclick="switchTab('${tab}')"]`);
+      const activeTab = document.getElementById(`tab-${tab}`);
+
+      if (activeBtn && activeTab) {
+        activeBtn.classList.add('active');
+        activeBtn.setAttribute('aria-selected', 'true');
+        activeTab.removeAttribute('hidden');
+        setTimeout(() => {
+          activeTab.classList.add('active');
+          activeTab.style.opacity = 1;
+        }, 10);
+        activeTab.focus();
+      }
+    }
+
+    // Drag & Drop for media file
+    const dropzone = document.getElementById('dropzone');
+    const mediaFileInput = document.getElementById('mediaFile');
+    const mediaPreview = document.getElementById('media-preview');
+
+    dropzone.addEventListener('click', () => mediaFileInput.click());
+
+    dropzone.addEventListener('dragover', e => {
+      e.preventDefault();
+      dropzone.classList.add('dragover');
+    });
+    dropzone.addEventListener('dragleave', e => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+    });
+    dropzone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) {
+        const file = e.dataTransfer.files[0];
+        mediaFileInput.files = e.dataTransfer.files;
+        previewMedia(file);
+      }
+    });
+
+    mediaFileInput.addEventListener('change', e => {
+      if (e.target.files.length) {
+        previewMedia(e.target.files[0]);
+      }
+    });
+
+    function previewMedia(file) {
+      mediaPreview.innerHTML = '';
+      const url = URL.createObjectURL(file);
+      if (file.type.startsWith('image/')) {
+        mediaPreview.innerHTML = `<img src="${url}" alt="Preview ảnh" />`;
+      } else if (file.type.startsWith('video/')) {
+        mediaPreview.innerHTML = `<video controls src="${url}" />`;
+      } else {
+        mediaPreview.textContent = 'File không hỗ trợ xem trước.';
+      }
+    }
+
+    // Validate helper
+    function validateInput(id, condition, errorId) {
+      const el = document.getElementById(id);
+      const err = document.getElementById(errorId);
+      if (condition) {
+        err.style.display = 'none';
+        return true;
+      } else {
+        err.style.display = 'block';
+        return false;
+      }
+    }
+
+    // Hàm giả lập post bài (gọi API backend)
+    async function postToFacebook() {
+      const cookie = document.getElementById('cookie').value.trim();
+      const message = document.getElementById('message').value.trim();
+      const fileInput = mediaFileInput;
+      const log = document.getElementById('log');
+
+      if (
+        !validateInput('cookie', cookie.length > 0, 'err-cookie') ||
+        !validateInput('message', message.length > 0, 'err-message')
+      ) {
+        log.textContent = '❌ Vui lòng điền đủ thông tin bắt buộc.';
+        return;
+      }
+      log.textContent = '⏳ Đang đăng bài...';
+
+      const formData = new FormData();
+      formData.append('cookie', cookie);
+      formData.append('message', message);
+      if (fileInput.files.length) {
+        formData.append('media', fileInput.files[0]);
+      }
+
+      try {
+        const response = await fetch('http://localhost:5000/post', {
+          method: 'POST',
+          body: formData,
+        });
+        const data = await response.json();
+        if (data.success) {
+          log.textContent = '✅ Đăng bài thành công!';
+        } else {
+          log.textContent = '❌ Đăng bài thất bại:\n' + (data.error || 'Không rõ nguyên nhân');
+        }
+      } catch (err) {
+        log.textContent = '❌ Lỗi khi gửi yêu cầu:\n' + err.message;
+      }
+    }
+
+    // Hàm giả lập thả cảm xúc
+    async function reactToPost() {
+      const cookie = document.getElementById('cookieReact').value.trim();
+      const postID = document.getElementById('postID').value.trim();
+      const reaction = document.getElementById('reaction').value;
+      const log = document.getElementById('log-react');
+
+      if (
+        !validateInput('cookieReact', cookie.length > 0, 'err-cookieReact') ||
+        !validateInput('postID', postID.length > 0, 'err-postID')
+      ) {
+        log.textContent = '❌ Vui lòng điền đủ thông tin bắt buộc.';
+        return;
+      }
+      log.textContent = '⏳ Đang thả cảm xúc...';
+
+      try {
+        const res = await fetch('http://localhost:5000/react', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cookie, postID, reaction }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          log.textContent = '✅ Thả cảm xúc thành công!';
+        } else {
+          log.textContent = '❌ Thả cảm xúc thất bại:\n' + (data.error || 'Không rõ nguyên nhân');
+        }
+      } catch (err) {
+        log.textContent = '❌ Lỗi khi gửi yêu cầu:\n' + err.message;
+      }
+    }
+
+    // Hàm giả lập bình luận
+    async function commentOnPost() {
+      const cookie = document.getElementById('cookieComment').value.trim();
+      const postID = document.getElementById('postIDComment').value.trim();
+      const commentText = document.getElementById('commentText').value.trim();
+      const log = document.getElementById('log-comment');
+
+      if (
+        !validateInput('cookieComment', cookie.length > 0, 'err-cookieComment') ||
+        !validateInput('postIDComment', postID.length > 0, 'err-postIDComment') ||
+        !validateInput('commentText', commentText.length > 0, 'err-commentText')
+      ) {
+        log.textContent = '❌ Vui lòng điền đủ thông tin bắt buộc.';
+        return;
+      }
+      log.textContent = '⏳ Đang gửi bình luận...';
+
+      try {
+        const res = await fetch('http://localhost:5000/comment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cookie, postID, commentText }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          log.textContent = '✅ Bình luận thành công!';
+        } else {
+          log.textContent = '❌ Bình luận thất bại:\n' + (data.error || 'Không rõ nguyên nhân');
+        }
+      } catch (err) {
+        log.textContent = '❌ Lỗi khi gửi yêu cầu:\n' + err.message;
+      }
+    }
+
+    // Hàm giả lập chia sẻ
+    async function sharePost() {
+      const cookie = document.getElementById('cookieShare').value.trim();
+      const postID = document.getElementById('postIDShare').value.trim();
+      const shareText = document.getElementById('shareText').value.trim();
+      const log = document.getElementById('log-share');
+
+      if (
+        !validateInput('cookieShare', cookie.length > 0, 'err-cookieShare') ||
+        !validateInput('postIDShare', postID.length > 0, 'err-postIDShare')
+      ) {
+        log.textContent = '❌ Vui lòng điền đủ thông tin bắt buộc.';
+        return;
+      }
+      log.textContent = '⏳ Đang chia sẻ bài viết...';
+
+      try {
+        const res = await fetch('http://localhost:5000/share', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cookie, postID, shareText }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          log.textContent = '✅ Chia sẻ thành công!';
+        } else {
+          log.textContent = '❌ Chia sẻ thất bại:\n' + (data.error || 'Không rõ nguyên nhân');
+        }
+      } catch (err) {
+        log.textContent = '❌ Lỗi khi gửi yêu cầu:\n' + err.message;
+      }
+    }
+
+    // Gắn sự kiện nút
+    document.getElementById('postBtn').addEventListener('click', postToFacebook);
+    document.getElementById('reactBtn').addEventListener('click', reactToPost);
+    document.getElementById('commentBtn').addEventListener('click', commentOnPost);
+    document.getElementById('shareBtn').addEventListener('click', sharePost);
+    document.getElementById('cookingBtn').addEventListener('click', sharePost);
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(tabC => tabC.classList.remove('active'));
+      document.querySelector(`.tab-button[onclick="switchTab('${tab}')"]`).classList.add('active');
+      document.getElementById(`tab-${tab}`).classList.add('active');
+    }
+  </script>
+</body>
+</html>
